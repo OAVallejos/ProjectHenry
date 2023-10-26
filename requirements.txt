@@ -22,10 +22,10 @@ requests
 
 
 
-spacy==3.7.2
-spacy-legacy==3.0.12
-spacy-loggers==1.0.5
-spacytextblob==4.0.0
+spacy
+spacy-legacy
+spacy-loggers
+spacytextblob 
 
 
 starlette
