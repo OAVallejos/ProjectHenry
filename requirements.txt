@@ -4,3 +4,5 @@ numpy
 pandas
 textblob
 spacy
+uvicorn
+fastapi
