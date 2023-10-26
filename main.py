@@ -2,6 +2,14 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
+# main.py
+
+if __name__ == "__main__":
+    print("La aplicación se está ejecutando correctamente.")
+    # Aquí puedes agregar el código principal de tu aplicación
+
+
+
 # Datos de ejemplo (reemplázalos con tus datos reales)
 data = {
     "games": [
