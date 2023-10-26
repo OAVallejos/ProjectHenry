@@ -1,10 +1,7 @@
 nltk
-json
 pandas
 matplotlib
 uvicorn
 fastapi
-textblob
-matplotlib
 numpy
 
