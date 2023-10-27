@@ -16,40 +16,31 @@ app.add_middleware(
 # Abre el archivo CSV
 data_games = pd.read_csv('limpio_games_gituno.csv')
 
-def obtener_informacion_desarrollador(data_games, pregunta):
+def obtener_informacion_desarrollador(data_games, developer_id):
     # Filtrar las filas con precio igual a 0 (contenido gratuito)
     juegos_gratuitos = data_games[data_games['price'] == 0].copy()
 
     # Extraer el año (en formato YYYY) de la columna 'release_date' y asignar a la copia original
     juegos_gratuitos['release_year'] = juegos_gratuitos['release_date'].str.extract(r'(\d{4})')
 
-    # Agrupar por año y empresa desarrolladora, contar juegos gratuitos y juegos totales
-    agrupado = juegos_gratuitos.groupby(['release_year', 'developer']).agg({'app_name': 'count'})
+    # Filtrar los juegos del desarrollador con el ID proporcionado
+    juegos_del_desarrollador = juegos_gratuitos[juegos_gratuitos['developer'] == developer_id]
+
+    # Agrupar por año y contar juegos gratuitos
+    agrupado = juegos_del_desarrollador.groupby(['release_year']).agg({'app_name': 'count'})
 
     # Renombrar la columna
     agrupado = agrupado.rename(columns={'app_name': 'juegos_gratuitos'})
 
-    # Calcular el total de juegos por año y empresa
-    total_juegos = data_games.groupby(['release_date', 'developer']).agg({'app_name': 'count'})
-    total_juegos = total_juegos.rename(columns={'app_name': 'total_juegos'})
-
-    # Unir los DataFrames
-    resultado = agrupado.join(total_juegos)
-
     # Calcular el porcentaje de juegos gratuitos
-    resultado['porcentaje_gratuitos'] = (resultado['juegos_gratuitos'] / resultado['total_juegos']) * 100
-    if pregunta == "ID_del_desarrollador_con_más_juegos_gratuitos":
-        # Encontrar el ID del desarrollador con más juegos gratuitos lanzados
-        id_desarrollador_mas_juegos_gratuitos = resultado['juegos_gratuitos'].idxmax()
-        return {"ID_del_desarrollador_con_más_juegos_gratuitos": id_desarrollador_mas_juegos_gratuitos}
-    else:
-        # En tu función obtener_resultados
-        resultado_json = resultado.to_dict(orient='split')
-        return resultado_json
+    total_juegos = len(juegos_del_desarrollador)
+    agrupado['porcentaje_gratuitos'] = (agrupado['juegos_gratuitos'] / total_juegos) * 100
 
-# Crear un endpoint para obtener resultados por ID
-@app.get("/obtener_resultados/{id}")
-async def obtener_resultados(id: str = None):
-    pregunta = 'Cuál es el porcentaje de juegos gratuitos lanzados por año y desarrolladora'
-    resultado = obtener_informacion_desarrollador(data_games, pregunta)
+    resultado_json = agrupado.to_dict(orient='split')
+    return resultado_json
+
+# Crear un endpoint para obtener resultados por ID de desarrollador
+@app.get("/obtener_resultados/{developer_id}")
+async def obtener_resultados(developer_id: str):
+    resultado = obtener_informacion_desarrollador(data_games, developer_id)
     return resultado
