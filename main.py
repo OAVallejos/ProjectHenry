@@ -16,7 +16,10 @@ app.add_middleware(
 )
 
 # Cargar el archivo CSV una vez al iniciar la aplicación
-data_games = pd.read_csv('limpio_games_gituno.csv')
+try:
+    data_games = pd.read_csv('limpio_games_gituno.csv')
+except Exception as e:
+    raise Exception("Se produjo un error al leer el archivo CSV: " + str(e))
 
 # Función para buscar el desarrollador por ID
 def encontrar_desarrollador_por_id(id, data):
@@ -51,6 +54,9 @@ class Item(BaseModel):
 @app.post("/calculate")
 def calculate(items: List[Item]):
     # Verificar el rango de los valores antes de llamar a perform_calculation
+    if not items:
+        raise HTTPException(status_code=400, detail="La lista de items está vacía")
+    
     for item in items:
         if item.value < -3.4e38 or item.value > 3.4e38:
             raise HTTPException(status_code=400, detail="Invalid input data: Value is out of range")
@@ -59,11 +65,11 @@ def calculate(items: List[Item]):
         result = perform_calculation(items)
         return {"result": result}
     except ValueError as ve:
-        raise HTTPException(status_code=400, detail="Invalid input data: " + str(ve)
+        raise HTTPException(status_code=400, detail="Invalid input data: " + str(ve))
 
 # Crear un endpoint para obtener resultados por ID
 @app.get("/obtener_resultados/{id}")
-async def obtener_resultados(id: int = None):
+async def obtener_resultados(id: int):
     if id is None:
         return {"mensaje": "Por favor, proporciona un ID válido."}
     
@@ -75,6 +81,6 @@ async def obtener_resultados(id: int = None):
     resultado = procesar_desarrollador(nombre_del_desarrollador, data_games)
     
     if resultado is not None:
-        return resultado.to_dict(orient='split')
+        return resultado.to_dict()
     else:
         return {"mensaje": "No se encontraron datos para el ID proporcionado."}
