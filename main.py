@@ -1,10 +1,12 @@
 import pandas as pd
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from typing import List
 
 app = FastAPI()
 
-# Agregar el middleware CORS antes de definir tus rutas
+# Middleware CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Esto permite cualquier origen, debes ajustarlo para producción.
@@ -29,7 +31,7 @@ def procesar_desarrollador(desarrollador, data):
     if elementos_desarrollador.empty:
         return None
 
-    elementos_desarrollador['release_year'] = elementos_desarrollador['release_date'].str.extract(r'(\d{4})')
+    elementos_desarrollador['release_year'] = elementos_desarrollador['release_date'].str.extract(r'(\d{4}')
     
     elementos_por_año = elementos_desarrollador.groupby('release_year').size().reset_index(name='Cantidad de Items')
     
@@ -40,6 +42,24 @@ def procesar_desarrollador(desarrollador, data):
     resultado['Contenido Free en %'] = (resultado['Contenido Free en %'] / resultado['Cantidad de Items']) * 100
 
     return resultado
+
+# Modelo de datos para la solicitud
+class Item(BaseModel):
+    value: float
+
+# Modificada la función "calculate" para verificar el rango de los valores
+@app.post("/calculate")
+def calculate(items: List[Item]):
+    # Verificar el rango de los valores antes de llamar a perform_calculation
+    for item in items:
+        if item.value < -3.4e38 or item.value > 3.4e38:
+            raise HTTPException(status_code=400, detail="Invalid input data: Value is out of range")
+    
+    try:
+        result = perform_calculation(items)
+        return {"result": result}
+    except ValueError as ve:
+        raise HTTPException(status_code=400, detail="Invalid input data: " + str(ve))
 
 # Crear un endpoint para obtener resultados por ID
 @app.get("/obtener_resultados/{id}")
