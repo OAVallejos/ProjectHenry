@@ -31,7 +31,7 @@ def procesar_desarrollador(desarrollador, data):
     if elementos_desarrollador.empty:
         return None
 
-    elementos_desarrollador['release_year'] = elementos_desarrollador['release_date'].str.extract(r'(\d{4}')
+    elementos_desarrollador['release_year'] = elementos_desarrollador['release_date'].str.extract(r'(\d{4})')
     
     elementos_por_año = elementos_desarrollador.groupby('release_year').size().reset_index(name='Cantidad de Items')
     
