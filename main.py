@@ -80,14 +80,3 @@ def calculate(items: List[Item]):
 async def obtener_resultados(id: str):  # Cambiar id a cadena
     if id is None:
         return {"mensaje": "Por favor, proporciona un ID válido."}
-    nombre_del_desarrollador = encontrar_desarrollador_por_id(id, data_games)
-    
-    if nombre_del_desarrollador is None:
-        return {"mensaje": "No se encontró un desarrollador para el ID proporcionado."}
-    
-    resultado = procesar_desarrollador(nombre_del_desarrollador, data_games)
-    
-    if resultado is not None:
-        return resultado.to_dict()
-    else:
-        return {"mensaje": "No se encontraron datos para el ID proporcionado."}
