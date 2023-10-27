@@ -1,7 +1,19 @@
-from fastapi import FastAPI
+
 import pandas as pd
 
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware  # Importa el middleware de CORS
+
 app = FastAPI()
+
+# Agrega el middleware CORS antes de definir tus rutas
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Esto permite cualquier origen, debes ajustarlo para producción.
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Cargar los datos del archivo CSV al DataFrame
 data_games = pd.read_csv('limpio_games.csv')
