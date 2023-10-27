@@ -24,6 +24,9 @@ except Exception as e:
 
 # Función para buscar el desarrollador por ID
 def encontrar_desarrollador_por_id(id, data):
+    # Convertir id a un número
+    id = int(id)
+    
     fila = data[data['id'] == id]
     if not fila.empty:
         return fila['developer'].iloc[0]
@@ -74,10 +77,9 @@ def calculate(items: List[Item]):
 
 # Crear un endpoint para obtener resultados por ID
 @app.get("/obtener_resultados/{id}")
-async def obtener_resultados(id: int):
+async def obtener_resultados(id: str):  # Cambiar id a cadena
     if id is None:
         return {"mensaje": "Por favor, proporciona un ID válido."}
-    
     nombre_del_desarrollador = encontrar_desarrollador_por_id(id, data_games)
     
     if nombre_del_desarrollador is None:
