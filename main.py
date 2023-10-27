@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -43,6 +44,10 @@ def procesar_desarrollador(desarrollador, data):
     
     resultado = elementos_por_año.merge(elementos_gratuitos_por_año, on='release_year', how='left')
     resultado['Contenido Free en %'] = (resultado['Contenido Free en %'] / resultado['Cantidad de Items']) * 100
+
+    # Reemplazar NaN e Infinity con None
+    resultado = resultado.where(pd.notnull(resultado), None)
+    resultado = resultado.replace([np.inf, -np.inf], None)
 
     return resultado
 
