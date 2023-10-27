@@ -4,5 +4,3 @@ matplotlib
 uvicorn
 fastapi
 numpy
-re
-datetime
