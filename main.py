@@ -49,7 +49,7 @@ def obtener_informacion_desarrollador(data_games, pregunta):
 
 # Crear un endpoint para obtener resultados por ID
 @app.get("/obtener_resultados/{id}")
-async def obtener_resultados(id: str):
+async def obtener_resultados(id: str = None):
     pregunta = 'Cuál es el porcentaje de juegos gratuitos lanzados por año y desarrolladora'
     resultado = obtener_informacion_desarrollador(data_games, pregunta)
     return resultado
