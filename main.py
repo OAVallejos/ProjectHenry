@@ -1,5 +1,5 @@
 import pandas as pd
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List
@@ -9,7 +9,7 @@ app = FastAPI()
 # Middleware CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Esto permite cualquier origen, debes ajustarlo para producción.
+    allow_origins=["*"],  # Ajusta esto para la configuración de producción
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -59,7 +59,7 @@ def calculate(items: List[Item]):
         result = perform_calculation(items)
         return {"result": result}
     except ValueError as ve:
-        raise HTTPException(status_code=400, detail="Invalid input data: " + str(ve))
+        raise HTTPException(status_code=400, detail="Invalid input data: " + str(ve)
 
 # Crear un endpoint para obtener resultados por ID
 @app.get("/obtener_resultados/{id}")
