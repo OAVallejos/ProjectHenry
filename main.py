@@ -1,5 +1,4 @@
 import pandas as pd
-import re
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -14,10 +13,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-
 # Abre el archivo CSV
-data_games = pd.read_csv(r'limpio_games_gituno.csv')
+data_games = pd.read_csv('limpio_games_gituno.csv')
 
 def obtener_informacion_desarrollador(data_games, pregunta):
     # Filtrar las filas con precio igual a 0 (contenido gratuito)
@@ -53,5 +50,5 @@ def obtener_informacion_desarrollador(data_games, pregunta):
 @app.get("/obtener_resultados/{id}")
 async def obtener_resultados(id: str):
     pregunta = 'Cuál es el porcentaje de juegos gratuitos lanzados por año y desarrolladora'
-    resultado = obtener_informacion_desarrollador(merged_data, pregunta)
+    resultado = obtener_informacion_desarrollador(data_games, pregunta)
     return resultado
