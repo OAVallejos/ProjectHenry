@@ -1,54 +1,57 @@
 import pandas as pd
+import re
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
+# Agregar el middleware CORS antes de definir tus rutas
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # Esto permite cualquier origen, debes ajustarlo para producción.
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Cargar los datos del archivo CSV al DataFrame
-data_games = pd.read_csv('limpio_games.csv')
 
-# Definir la función obtener_tabla_por_id
-def obtener_tabla_por_id(df, id):
-    # Filtrar los juegos gratuitos (precio igual a 0) en el DataFrame con el ID proporcionado
-    juegos_gratuitos = df[(df['price'] == 0) & (df['developer'] == id)]
 
-    # Extraer el año de lanzamiento (solo los últimos 2 dígitos de "YY")
-    juegos_gratuitos['año_lanzamiento'] = juegos_gratuitos['release_date'].str[-2:]
+# Abre el archivo CSV
+data_games = pd.read_csv(r'limpio_games_gituno.csv')
 
-    # Contar la cantidad de juegos gratuitos por año
-    conteo_por_año = juegos_gratuitos['año_lanzamiento'].value_counts()
+def obtener_informacion_desarrollador(data_games, pregunta):
+    # Filtrar las filas con precio igual a 0 (contenido gratuito)
+    juegos_gratuitos = data_games[data_games['price'] == 0].copy()
 
-    # Calcular el porcentaje de juegos gratuitos por año
-    total_juegos_por_año = df['release_date'].str[-2:].value_counts()
-    porcentaje_gratuitos_por_año = (conteo_por_año / total_juegos_por_año) * 100
+    # Extraer el año (en formato YYYY) de la columna 'release_date' y asignar a la copia original
+    juegos_gratuitos['release_year'] = juegos_gratuitos['release_date'].str.extract(r'(\d{4})')
 
-    # Ordenar por año
-    porcentaje_gratuitos_por_año = porcentaje_gratuitos_por_año.sort_index()
+    # Agrupar por año y empresa desarrolladora, contar juegos gratuitos y juegos totales
+    agrupado = juegos_gratuitos.groupby(['release_year', 'developer']).agg({'app_name': 'count'})
 
-    # Agrupar los juegos gratuitos por desarrollador y año de lanzamiento
-    gratuitos_por_desarrollador = juegos_gratuitos.groupby(['developer', 'año_lanzamiento']).size().unstack(fill_value=0)
+    # Renombrar la columna
+    agrupado = agrupado.rename(columns={'app_name': 'juegos_gratuitos'})
 
-    return porcentaje_gratuitos_por_año, gratuitos_por_desarrollador
+    # Calcular el total de juegos por año y empresa
+    total_juegos = data_games.groupby(['release_date', 'developer']).agg({'app_name': 'count'})
+    total_juegos = total_juegos.rename(columns={'app_name': 'total_juegos'})
+
+    # Unir los DataFrames
+    resultado = agrupado.join(total_juegos)
+
+    # Calcular el porcentaje de juegos gratuitos
+    resultado['porcentaje_gratuitos'] = (resultado['juegos_gratuitos'] / resultado['total_juegos']) * 100
+
+    if pregunta == "ID_del_desarrollador_con_más_juegos_gratuitos":
+        # Encontrar el ID del desarrollador con más juegos gratuitos lanzados
+        id_desarrollador_mas_juegos_gratuitos = resultado['juegos_gratuitos'].idxmax()
+        return id_desarrollador_mas_juegos_gratuitos
+    else:
+        return resultado
 
 # Crear un endpoint para obtener resultados por ID
 @app.get("/obtener_resultados/{id}")
 async def obtener_resultados(id: str):
-    porcentaje_por_año, juegos_por_desarrollador = obtener_tabla_por_id(data_games, id)
-
-    # Crear un diccionario con los resultados
-    resultados = {
-        'porcentaje_por_año': porcentaje_por_año.to_dict(),
-        'juegos_por_desarrollador': juegos_por_desarrollador.to_dict()
-    }
-
-    return resultados
-
-
+    pregunta = 'Cuál es el porcentaje de juegos gratuitos lanzados por año y desarrolladora'
+    resultado = obtener_informacion_desarrollador(merged_data, pregunta)
+    return resultado
