@@ -38,13 +38,14 @@ def obtener_informacion_desarrollador(data_games, pregunta):
 
     # Calcular el porcentaje de juegos gratuitos
     resultado['porcentaje_gratuitos'] = (resultado['juegos_gratuitos'] / resultado['total_juegos']) * 100
-
     if pregunta == "ID_del_desarrollador_con_más_juegos_gratuitos":
         # Encontrar el ID del desarrollador con más juegos gratuitos lanzados
         id_desarrollador_mas_juegos_gratuitos = resultado['juegos_gratuitos'].idxmax()
-        return id_desarrollador_mas_juegos_gratuitos
+        return {"ID_del_desarrollador_con_más_juegos_gratuitos": id_desarrollador_mas_juegos_gratuitos}
     else:
-        return resultado
+        # En tu función obtener_resultados
+        resultado_json = resultado.to_dict(orient='split')
+        return resultado_json
 
 # Crear un endpoint para obtener resultados por ID
 @app.get("/obtener_resultados/{id}")
