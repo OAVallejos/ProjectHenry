@@ -29,6 +29,8 @@ def encontrar_desarrollador_por_id(id, data_games):
     else:
         return "No se encontró un desarrollador para el ID proporcionado."
 
+
+
 def developer(desarrollador, data_games):
     
     # Filtrar los elementos asociados a la empresa desarrolladora especificada
@@ -50,27 +52,7 @@ def developer(desarrollador, data_games):
 
     return resultado
 
-# Crear un endpoint para obtener resultados por ID
-@app.get("/obtener_resultados/{id}")
-async def obtener_resultados(id: int = None):
-    if id is None:
-        return {"mensaje": "Por favor, proporciona un ID válido."}
-    
-    nombre_del_desarrollador = encontrar_desarrollador_por_id(id, data_games)
-    
-    if nombre_del_desarrollador == "No se encontró un desarrollador para el ID proporcionado.":
-        return {"mensaje": nombre_del_desarrollador}
-    
-    resultado = developer(nombre_del_desarrollador, data_games)
-    
-    if not resultado.empty:
-        return resultado.to_dict(orient='split')
-    else:
-        return {"mensaje": "No se encontraron datos para el ID proporcionado."}
-    
-    
-    
-app = FastAPI()
+
 
 # Cargar el archivo CSV una vez al iniciar la aplicación
 try:
@@ -104,6 +86,43 @@ def userdata(user_id: str, data_dos):
 
     return user_data
 
+
+
+# Crear un endpoint para obtener resultados por ID
+@app.get("/obtener_resultados/{id}")
+async def obtener_resultados(id: int = None):
+    if id is None:
+        return {"mensaje": "Por favor, proporciona un ID válido."}
+    
+    nombre_del_desarrollador = encontrar_desarrollador_por_id(id, data_games)
+    
+    if nombre_del_desarrollador == "No se encontró un desarrollador para el ID proporcionado.":
+        return {"mensaje": nombre_del_desarrollador}
+    
+    resultado = developer(nombre_del_desarrollador, data_games)
+    
+    if not resultado.empty:
+        return resultado.to_dict(orient='split')
+    else:
+        return {"mensaje": "No se encontraron datos para el ID proporcionado."}
+
+
+
+
+
+
 @app.get("/user_data/{user_id}")
 async def get_user_data(user_id: str) -> Dict:
     return userdata(user_id, data_dos)
+
+
+
+
+
+
+
+
+
+
+
+
