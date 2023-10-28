@@ -207,7 +207,7 @@ async def obtener_mejores_desarrolladores_anio(anio: int):
 
 
 # Define un punto final (endpoint) para analizar reseñas de un desarrollador
-@app.post("/analizar_desarrollador/{desarrolladora}")
+@app.get("/analizar_desarrollador/{desarrolladora}")
 async def analizar_desarrollador(desarrolladora: str):
     analysis_result = developer_reviews_analysis('desarrolladora'(desarrolladora))
     return analysis_result
