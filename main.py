@@ -17,7 +17,7 @@ app.add_middleware(
 # PRIMER CONSULTA Abre el archivo CSV
 data_games = pd.read_csv('limpio_games_gituno.csv')
 
-def developer(desarrollador: str, data_games: pd.DataFrame):
+def process_developer(desarrollador: str, data_games: pd.DataFrame):
     # Filtrar los elementos asociados a la empresa desarrolladora especificada
     elementos_desarrollador = data_games[data_games['developer'] == desarrollador]
 
@@ -167,9 +167,9 @@ def developer_reviews_analysis(desarrolladora):
 # Endpoint
 
 @app.get("/developer/{developer}")
-def get_developer(developer: str):
+def get_developer(desarrollador: str):
     # Supongamos que 'data_games' es tu DataFrame de pandas
-    resultado = developer(developer, data_games)
+    resultado = process_developer(desarrollador, data_games)
     # Convertir DataFrame a diccionario de Python
     resultado_dict = resultado.to_dict()
     return resultado_dict
