@@ -169,7 +169,7 @@ async def get_user_for_genre(genre: str):
 
 
 @app.get("/mejores_desarrolladores_año/{año}")
-def obtener_mejores_desarrolladores_año(año: int):
+async def obtener_mejores_desarrolladores_año(año: int):
     resultado = mejores_desarrolladores_año(año)
     return resultado
 
