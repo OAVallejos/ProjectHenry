@@ -74,7 +74,7 @@ app = FastAPI()
 
 # Cargar el archivo CSV una vez al iniciar la aplicación
 try:
-    data_dos = pd.read_csv('data_dos.csv')
+    data_dos = pd.read_csv('user_data_subset.csv')
 except Exception as e:
     raise Exception("Se produjo un error al leer el archivo CSV: " + str(e))
 
