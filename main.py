@@ -116,9 +116,9 @@ def UserForGenre(data_games_nuevo, data_reviews_nuevo, genre):
 result = pd.read_csv('resultados_endcuatro.csv')
 
 
-def mejores_desarrolladores_año(año: int):
+def mejores_desarrolladores_anio(anio: int):
     # Paso 1: Filtrar las revisiones para el año proporcionado y donde recommend es True y sentiment_analysis es positivo
-    revisiones_filtradas = result[(result['year_posted'] == año) &
+    revisiones_filtradas = result[(result['year_posted'] == anio) &
                                   (result['recommend'] == True) &
                                   (result['sentiment_analysis'] > 0)]
 
@@ -168,8 +168,8 @@ async def get_user_for_genre(genre: str):
     return resultado
 
 
-@app.get("/mejores_desarrolladores_año/{año}")
-async def obtener_mejores_desarrolladores_año(año: int):
-    resultado = mejores_desarrolladores_año(año)
+@app.get("/mejores_desarrolladores_año/{anio}")
+async def obtener_mejores_desarrolladores_anio(anio: int):
+    resultado = mejores_desarrolladores_anio(anio)
     return resultado
 
