@@ -168,9 +168,8 @@ async def get_user_for_genre(genre: str):
     return resultado
 
 
-@app.get("/user_for_genre/{genre}")
-async def get_user_for_genre(genre: str):
-    resultado = UserForGenre(data_games_nuevo, data_reviews_nuevo, genre)  # Asegúrate de definir UserForGenre
+@app.get("/mejores_desarrolladores_año/{año}")
+def obtener_mejores_desarrolladores_año(año: int):
+    resultado = mejores_desarrolladores_año(año)
     return resultado
-
 
