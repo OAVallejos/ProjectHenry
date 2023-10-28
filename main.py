@@ -3,7 +3,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Dict
 
-
 app = FastAPI()
 
 # Agregar el middleware CORS antes de definir tus rutas
@@ -15,7 +14,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Abre el archivo CSV
+# PRIMER CONSULTA Abre el archivo CSV
 data_games = pd.read_csv('limpio_games_gituno.csv')
 
 def encontrar_desarrollador_por_id(id, data_games):
@@ -28,8 +27,6 @@ def encontrar_desarrollador_por_id(id, data_games):
         return desarrollador
     else:
         return "No se encontró un desarrollador para el ID proporcionado."
-
-
 
 def developer(desarrollador, data_games):
     
@@ -52,9 +49,7 @@ def developer(desarrollador, data_games):
 
     return resultado
 
-
-
-# Cargar el archivo CSV una vez al iniciar la aplicación
+# SEGUNDA CONSULTA Cargar el archivo CSV una vez al iniciar la aplicación
 try:
     data_dos = pd.read_csv('user_data_subset.csv')
 except Exception as e:
@@ -86,6 +81,36 @@ def userdata(user_id: str, data_dos):
 
     return user_data
 
+# TERCERA CONSULTA Cargar los archivos CSV una vez al iniciar la aplicación
+data_reviews_nuevo = pd.read_csv('data_reviews_endtres.csv')
+data_games_nuevo = pd.read_csv('data_games_endtres.csv')
+
+
+def UserForGenre(data_games_nuevo, data_reviews_nuevo, genre):
+    # Paso 1: Filtrar los juegos del género específico en data_games
+    genre_filter = data_games_nuevo['genres'].str.contains(genre, case=False, na=False)
+    genre_games = data_games_nuevo[genre_filter]
+
+    if genre_games.empty:
+        return f"No se encontraron juegos en el género '{genre}'"
+
+    # Paso : Filtrar las reseñas en data_reviews que corresponden a estos juegos
+    genre_reviews = data_reviews_nuevo[data_reviews_nuevo['item_id'].isin(genre_games['id'])]
+
+    # Paso : Calcular la cantidad total de horas jugadas por año de lanzamiento en las reseñas
+    playtime_by_year = genre_reviews.groupby('year_posted')['sentiment_analysis'].count().reset_index()
+    playtime_by_year.columns = ['Año', 'Horas']
+
+    # Paso : Encontrar el usuario con más horas jugadas y construir el resultado deseado
+    max_user_id = genre_reviews.groupby('user_id')['sentiment_analysis'].count().idxmax()
+    
+    result = {
+        "Usuario con más horas jugadas para género": max_user_id,
+        "Horas jugadas": playtime_by_year.to_dict(orient='records')
+    }
+
+    return result
+
 
 
 # Crear un endpoint para obtener resultados por ID
@@ -106,16 +131,15 @@ async def obtener_resultados(id: int = None):
     else:
         return {"mensaje": "No se encontraron datos para el ID proporcionado."}
 
-
-
-
-
-
 @app.get("/user_data/{user_id}")
 async def get_user_data(user_id: str) -> Dict:
     return userdata(user_id, data_dos)
 
 
+@app.get("/user_for_genre/{genre}")
+async def get_user_for_genre(genre: str):
+    resultado = UserForGenre(data_games_nuevo, data_reviews_nuevo, genre)
+    return resultado
 
 
 
