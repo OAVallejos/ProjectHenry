@@ -2,6 +2,7 @@ import pandas as pd
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Dict
+from pydantic import BaseModel
 
 app = FastAPI()
 
@@ -136,10 +137,40 @@ def mejores_desarrolladores_anio(anio: int):
 
     return resultado
 
+# QUINTA CONSULTA
+
+# Guardar el DataFrame 'result' en un archivo CSV
+resultado.to_csv('resultado_endcinco.csv', index=False)
+
+# Define la función que toma el nombre del desarrollador como entrada
+def developer_reviews_analysis(desarrolladora):
+    # Filtra las reseñas para el desarrollador especificado
+    developer_data = resultado[resultado['developer'] == desarrolladora]
+
+    # Contar la cantidad de reseñas positivas, negativas y neutras para ese desarrollador
+    total_reviews = len(developer_data)
+    positive_reviews = (developer_data['sentiment_analysis'] == 2).sum()
+    negative_reviews = (developer_data['sentiment_analysis'] == 0).sum()
+    neutral_reviews = (developer_data['sentiment_analysis'] == 1).sum()
+
+    # Devuelve la información del desarrollador como un diccionario
+    analysis_result = {
+        "desarrolladora": desarrolladora,
+        "total_reviews": total_reviews,
+        "positive_reviews": positive_reviews,
+        "negative_reviews": negative_reviews,
+        "neutral_reviews": neutral_reviews
+    }
+
+    # Retorna el resultado
+    return analysis_result
 
 
 
-# Crear un endpoint para obtener resultados por ID
+
+
+
+# Crear un endpoint para obtener resultados 
 @app.get("/obtener_resultados/{id}")
 async def obtener_resultados(id: int = None):
     if id is None:
@@ -173,3 +204,9 @@ async def obtener_mejores_desarrolladores_anio(anio: int):
     resultado = mejores_desarrolladores_anio(anio)
     return resultado
 
+
+# Define un punto final (endpoint) para analizar reseñas de un desarrollador
+@app.post("/analizar_desarrollador/{desarrolladora}")
+async def analizar_desarrollador(desarrolladora: str):
+    analysis_result = developer_reviews_analysis('desarrolladora'(desarrolladora))
+    return analysis_result
