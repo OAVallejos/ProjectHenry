@@ -1,6 +1,8 @@
 import pandas as pd
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from typing import Dict
+
 
 app = FastAPI()
 
@@ -65,3 +67,43 @@ async def obtener_resultados(id: int = None):
         return resultado.to_dict(orient='split')
     else:
         return {"mensaje": "No se encontraron datos para el ID proporcionado."}
+    
+    
+    
+app = FastAPI()
+
+# Cargar el archivo CSV una vez al iniciar la aplicación
+try:
+    data_dos = pd.read_csv('data_dos.csv')
+except Exception as e:
+    raise Exception("Se produjo un error al leer el archivo CSV: " + str(e))
+
+def userdata(user_id: str, data_dos):
+    # Filtrar las revisiones del usuario
+    user_reviews = data_dos[data_dos['user_id'] == user_id]
+
+    # Filtrar las compras del usuario
+    user_purchases = data_dos[data_dos['user_id'] == user_id]
+
+    # Calcular la cantidad total de dinero gastado por el usuario
+    user_game_ids = user_purchases['item_id']
+    total_money_spent = user_purchases['price'].sum()
+
+    # Calcular el porcentaje de recomendación promedio
+    total_recommendation_percentage = user_reviews['recommend'].mean()
+
+    # Contar la cantidad de elementos comprados por el usuario
+    num_items_purchased = len(user_purchases)
+
+    user_data = {
+        "Usuario": user_id,
+        "Dinero gastado": f"{total_money_spent} USD",
+        "% de recomendación": f"{total_recommendation_percentage:.2f}%",
+        "Cantidad de items": num_items_purchased,
+    }
+
+    return user_data
+
+@app.get("/user_data/{user_id}")
+async def get_user_data(user_id: str) -> Dict:
+    return userdata(user_id, data_dos)
