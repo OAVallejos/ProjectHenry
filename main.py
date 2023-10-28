@@ -36,7 +36,7 @@ def encontrar_desarrollador_por_id(id, data):
 def procesar_desarrollador(desarrollador, data):
     elementos_desarrollador = data[data['developer'] == desarrollador]
     if elementos_desarrollador.empty:
-        return None
+        return {"mensaje": "No se encontraron elementos para el desarrollador proporcionado."}
 
     elementos_desarrollador['release_year'] = elementos_desarrollador['release_date'].str.extract(r'(\d{4})')
     
@@ -47,6 +47,10 @@ def procesar_desarrollador(desarrollador, data):
     
     resultado = elementos_por_año.merge(elementos_gratuitos_por_año, on='release_year', how='left')
     resultado['Contenido Free en %'] = (resultado['Contenido Free en %'] / resultado['Cantidad de Items']) * 100
+
+    # Verificar si el resultado es None
+    if resultado is None:
+        return {"mensaje": "No se pudo calcular el resultado para el desarrollador proporcionado."}
 
     # Reemplazar NaN e Infinity con None
     resultado = resultado.where(pd.notnull(resultado), None)
@@ -73,10 +77,4 @@ def calculate(items: List[Item]):
         result = perform_calculation(items)
         return {"result": result}
     except ValueError as ve:
-        raise HTTPException(status_code=400, detail="Invalid input data: " + str(ve))
-
-# Crear un endpoint para obtener resultados por ID
-@app.get("/obtener_resultados/{id}")
-async def obtener_resultados(id: str):  # Cambiar id a cadena
-    if id is None:
-        return {"mensaje": "Por favor, proporciona un ID válido."}
+        return {}
