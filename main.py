@@ -24,11 +24,8 @@ def developer(desarrollador: str, data_games: pd.DataFrame):
     if elementos_desarrollador.empty:
         return "No se encontraron elementos para la empresa desarrolladora especificada."
 
-    # Extraer el año (en formato YYYY) de la columna 'release_date'
-    elementos_desarrollador['release_year'] = elementos_desarrollador['release_date'].str.extract(r'(\d{4})')
-
-    # Convertir columnas con 'numpy.int64' a Python nativo
-    elementos_desarrollador['release_year'] = elementos_desarrollador['release_year'].astype(int)
+    # Convert 'release_year' column to native Python integers
+    elementos_desarrollador['release_year'] = elementos_desarrollador['release_year'].str.astype(int)
 
     # Calcular la cantidad de elementos lanzados por año
     elementos_por_anio = elementos_desarrollador['release_year'].value_counts().reset_index()
@@ -168,11 +165,10 @@ def developer_reviews_analysis(desarrolladora):
 
 
 
-
-
 @app.get("/obtener_resultados/{desarrollador}")
 async def obtener_resultados(desarrollador: str):
     resultado = developer(desarrollador, data_games)
+    resultado = resultado.astype(object)
     return resultado
 
 
