@@ -147,14 +147,19 @@ def developer_reviews_analysis(desarrolladora):
 
     # Contar la cantidad de reseñas positivas, negativas y neutras para ese desarrollador
     total_reviews = len(developer_data)
-    positive_reviews = int(developer_data['sentiment_analysis'] == 2).sum()
-    negative_reviews = int(developer_data['sentiment_analysis'] == 0).sum()
-    neutral_reviews = int(developer_data['sentiment_analysis'] == 1).sum()
+    positive_reviews = (developer_data['sentiment_analysis'] == 2).sum()
+    negative_reviews = (developer_data['sentiment_analysis'] == 0).sum()
+    neutral_reviews = (developer_data['sentiment_analysis'] == 1).sum()
+    
+    # Convertir los resultados a enteros
+    positive_reviews = int(positive_reviews)
+    negative_reviews = int(negative_reviews)
+    neutral_reviews = int(neutral_reviews)
 
     # Devuelve la información del desarrollador como un diccionario
     analysis_result = {
         "desarrolladora": desarrolladora,
-        "total_reviews": total_reviews,
+        "total_resenias": total_reviews,
         "positive_reviews": positive_reviews,
         "negative_reviews": negative_reviews,
         "neutral_reviews": neutral_reviews
