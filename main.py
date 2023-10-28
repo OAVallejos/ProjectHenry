@@ -112,6 +112,32 @@ def UserForGenre(data_games_nuevo, data_reviews_nuevo, genre):
     return result
 
 
+# CUARTA 4 CONSULTA 
+result = pd.read_csv('resultados_endcuatro.csv')
+
+
+def mejores_desarrolladores_año(año: int):
+    # Paso 1: Filtrar las revisiones para el año proporcionado y donde recommend es True y sentiment_analysis es positivo
+    revisiones_filtradas = result[(result['year_posted'] == año) &
+                                  (result['recommend'] == True) &
+                                  (result['sentiment_analysis'] > 0)]
+
+    # Paso 2: Agrupar por desarrollador y contar la cantidad de juegos recomendados
+    desarrolladores_recomendados = revisiones_filtradas.groupby('developer')['recommend'].count().reset_index()
+
+    # Paso 3: Ordenar en orden descendente y tomar el top 3
+    top_desarrolladores = desarrolladores_recomendados.sort_values(by='recommend', ascending=False).head(3)
+
+    # Verificar si top_desarrolladores tiene al menos 3 elementos
+    if len(top_desarrolladores) >= 3:
+        resultado = [{"Puesto " + str(i + 1): top_desarrolladores.iloc[i]['developer']} for i in range(3)]
+    else:
+        resultado = [{"Puesto " + str(i + 1): "No disponible"} for i in range(len(top_desarrolladores))]
+
+    return resultado
+
+
+
 
 # Crear un endpoint para obtener resultados por ID
 @app.get("/obtener_resultados/{id}")
@@ -142,11 +168,9 @@ async def get_user_for_genre(genre: str):
     return resultado
 
 
-
-
-
-
-
-
+@app.get("/user_for_genre/{genre}")
+async def get_user_for_genre(genre: str):
+    resultado = UserForGenre(data_games_nuevo, data_reviews_nuevo, genre)  # Asegúrate de definir UserForGenre
+    return resultado
 
 
