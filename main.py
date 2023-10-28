@@ -25,7 +25,7 @@ def developer(desarrollador: str, data_games: pd.DataFrame):
         return "No se encontraron elementos para la empresa desarrolladora especificada."
 
     # Convert 'release_year' column to native Python integers
-    elementos_desarrollador['release_year'] = elementos_desarrollador['release_year'].str.astype(int)
+    elementos_desarrollador['release_year'] = elementos_desarrollador['release_date'].str.extract(r'(\d{4})')
 
     # Calcular la cantidad de elementos lanzados por año
     elementos_por_anio = elementos_desarrollador['release_year'].value_counts().reset_index()
