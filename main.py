@@ -2,7 +2,6 @@ import pandas as pd
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Dict
-from pydantic import BaseModel
 
 app = FastAPI()
 
@@ -138,8 +137,6 @@ def mejores_desarrolladores_anio(anio: int):
     return resultado
 
 # QUINTA CONSULTA
-
-
 # Cargar el archivo CSV en un nuevo DataFrame
 resultado = pd.read_csv('resultado_endcinco.csv')
 
@@ -206,7 +203,6 @@ async def obtener_mejores_desarrolladores_anio(anio: int):
     return resultado
 
 
-# Define un punto final (endpoint) para analizar reseñas de un desarrollador
 @app.get("/analizar_desarrollador/{desarrolladora}")
 async def analizar_desarrollador(desarrolladora: str):
     analysis_result = developer_reviews_analysis('desarrolladora'(desarrolladora))
