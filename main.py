@@ -40,8 +40,16 @@ def process_developer(desarrollador: str, data_games: pd.DataFrame):
     resultado = elementos_por_anio.merge(elementos_gratuitos_por_anio, on='Anio', how='left')
     resultado['Contenido Free en %'] = (resultado['Contenido Free en %'] / resultado['Cantidad de Items']) * 100
 
-    return resultado
+    # Reemplazar NaN, Infinity y -Infinity por None
+    resultado = resultado.replace([np.inf, -np.inf, np.nan], None)
 
+    # Convertir DataFrame a diccionario de Python
+    resultado_dict = resultado.to_dict()
+
+    # Convertir diccionario de Python a JSON
+    resultado_json = json.dumps(resultado_dict, separators=(",", ":"))
+
+    return resultado_json
 
 # SEGUNDA CONSULTA Cargar el archivo CSV una vez al iniciar la aplicación
 try:
@@ -165,15 +173,10 @@ def developer_reviews_analysis(desarrolladora):
 
 
 # Endpoint
-
 @app.get("/developer/{developer}")
-def get_developer(desarrollador: str):
-    # Supongamos que 'data_games' es tu DataFrame de pandas
-    resultado = process_developer(desarrollador, data_games)
-    # Convertir DataFrame a diccionario de Python
-    resultado_dict = resultado.to_dict()
-    return resultado_dict
-
+async def get_developer(developer: str):
+    resultado_json = process_developer(developer, data_games)
+    return resultado_json
 
 @app.get("/user_data/{user_id}")
 async def get_user_data(user_id: str) -> Dict:
