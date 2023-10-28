@@ -164,12 +164,15 @@ def developer_reviews_analysis(desarrolladora):
 
 
 
+# Endpoint
 
-@app.get("/obtener_resultados/{desarrollador}")
-async def obtener_resultados(desarrollador: str):
-    resultado = developer(desarrollador, data_games)
-    resultado = resultado.astype(object)
-    return resultado
+@app.get("/developer/{developer}")
+def get_developer(developer: str):
+    # Supongamos que 'data_games' es tu DataFrame de pandas
+    resultado = developer(developer, data_games)
+    # Convertir DataFrame a diccionario de Python
+    resultado_dict = resultado.to_dict()
+    return resultado_dict
 
 
 @app.get("/user_data/{user_id}")
