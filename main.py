@@ -139,8 +139,9 @@ def mejores_desarrolladores_anio(anio: int):
 
 # QUINTA CONSULTA
 
-# Guardar el DataFrame 'result' en un archivo CSV
-resultado.to_csv('resultado_endcinco.csv', index=False)
+
+# Cargar el archivo CSV en un nuevo DataFrame
+resultado = pd.read_csv('resultado_endcinco.csv')
 
 # Define la función que toma el nombre del desarrollador como entrada
 def developer_reviews_analysis(desarrolladora):
