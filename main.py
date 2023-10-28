@@ -17,7 +17,7 @@ app.add_middleware(
 # PRIMER CONSULTA Abre el archivo CSV
 data_games = pd.read_csv('limpio_games_gituno.csv')
 
-def developer(desarrollador: str, data_games: data_games):
+def developer(desarrollador: str, data_games: pd.DataFrame):
     # Filtrar los elementos asociados a la empresa desarrolladora especificada
     elementos_desarrollador = data_games[data_games['developer'] == desarrollador]
 
@@ -26,6 +26,9 @@ def developer(desarrollador: str, data_games: data_games):
 
     # Extraer el año (en formato YYYY) de la columna 'release_date'
     elementos_desarrollador['release_year'] = elementos_desarrollador['release_date'].str.extract(r'(\d{4})')
+
+    # Convertir columnas con 'numpy.int64' a Python nativo
+    elementos_desarrollador['release_year'] = elementos_desarrollador['release_year'].astype(int)
 
     # Calcular la cantidad de elementos lanzados por año
     elementos_por_anio = elementos_desarrollador['release_year'].value_counts().reset_index()
@@ -167,7 +170,6 @@ def developer_reviews_analysis(desarrolladora):
 
 
 
-# Crear un endpoint para obtener resultados 
 @app.get("/obtener_resultados/{desarrollador}")
 async def obtener_resultados(desarrollador: str):
     resultado = developer(desarrollador, data_games)
