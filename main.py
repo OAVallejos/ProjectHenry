@@ -205,5 +205,5 @@ async def obtener_mejores_desarrolladores_anio(anio: int):
 
 @app.get("/analizar_desarrollador/{desarrolladora}")
 async def analizar_desarrollador(desarrolladora: str):
-    analysis_result = developer_reviews_analysis('desarrolladora'(desarrolladora))
+    analysis_result = developer_reviews_analysis(desarrolladora)
     return analysis_result
