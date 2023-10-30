@@ -5,6 +5,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from typing import Dict
 import json
 
+
+
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from tensorflow import keras
+from sklearn.preprocessing import LabelEncoder
+
+
+
+
 app = FastAPI()
 
 # Agregar el middleware CORS antes de definir tus rutas
@@ -174,6 +184,65 @@ def developer_reviews_analysis(desarrolladora):
 
 
 
+# Modelo
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
+tablas = pd.read_csv('modelo.csv')
+
+
+
+def entrenar_modelo(tablas):
+    # Divide los datos en características (X) y etiquetas (y)
+    X = tablas.drop('genres', axis=1)  # Excluye la columna 'genres' como característica
+    y = tablas['genres']
+
+    # Codifica los géneros como valores numéricos
+    label_encoder = LabelEncoder()
+    y_encoded = label_encoder.fit_transform(y)
+
+    # Divide los datos en conjuntos de entrenamiento y prueba
+    X_train, X_test, y_train, y_test = train_test_split(X, y_encoded, test_size=0.2, random_state=42)
+
+    # Selecciona las características numéricas
+    columnas_numericas = ['sentiment_analysis', 'items_count', 'price']
+
+    X_train_numerico = X_train[columnas_numericas]
+    X_test_numerico = X_test[columnas_numericas]
+
+    # Escala solo las características numéricas
+    scaler = StandardScaler()
+    X_train_numerico = scaler.fit_transform(X_train_numerico)
+    X_test_numerico = scaler.transform(X_test_numerico)
+
+    # Diseña la arquitectura de la red neuronal
+    model = keras.Sequential()
+    model.add(keras.layers.Input(shape=(X_train_numerico.shape[1],)))  # Capa de entrada
+    model.add(keras.layers.Dense(64, activation='relu'))  # Capa oculta 1
+    model.add(keras.layers.Dense(32, activation='relu'))  # Capa oculta 2
+    model.add(keras.layers.Dense(len(label_encoder.classes_), activation='softmax'))  # Capa de salida
+
+    # Compila el modelo
+    model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+
+    # Entrena el modelo
+    model.fit(X_train_numerico, y_train, epochs=10, batch_size=32, validation_split=0.2)
+
+    # Evalúa el modelo
+    score = model.evaluate(X_test_numerico, y_test)
+    logger.info(f'Precisión del modelo en el conjunto de prueba: {score[1]:.2f}')
+
+    # Devuelve el modelo entrenado
+    return model
+
+
+
+
+
+
 # Endpoint
 @app.get("/developer/{developer}")
 async def get_developer(developer: str):
@@ -201,3 +270,24 @@ async def obtener_mejores_desarrolladores_anio(anio: int):
 async def analizar_desarrollador(desarrolladora: str):
     analysis_result = developer_reviews_analysis(desarrolladora)
     return analysis_result
+
+
+
+
+
+# Enruta al punto final para realizar predicciones
+@app.get("/predecir_genero/")
+async def predecir_genero(juego: JuegoFicticio):
+    # Escala las características del nuevo juego
+    juego_numerico = np.array([[juego.sentiment_analysis, juego.items_count, juego.price]])
+    juego_numerico = scaler.transform(juego_numerico)
+
+    # Realiza la predicción del género
+    prediccion = model.predict(juego_numerico)
+
+    # Encuentra la categoría de género con la probabilidad más alta
+    categoria_genero_predicha = label_encoder.classes_[np.argmax(prediccion)]
+
+    # Devuelve la categoría de género predicha
+    return {"Categoría de género predicha": categoria_genero_predicha}
+
