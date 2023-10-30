@@ -186,6 +186,7 @@ def developer_reviews_analysis(desarrolladora):
 
 # Modelo
 
+
 # Carga el conjunto de datos desde el archivo CSV
 tablas = pd.read_csv('modelo.csv')
 
@@ -230,11 +231,6 @@ def entrenar_modelo(tablas):
 # Llama a la función para entrenar el modelo
 model, scaler, columnas_numericas = entrenar_modelo(tablas)
 
-# Definir la clase JuegoFicticio para el objeto de entrada
-class JuegoFicticio(BaseModel):
-    sentiment_analysis: int
-    items_count: int
-    price: int
 
 
 
@@ -278,10 +274,10 @@ async def analizar_desarrollador(desarrolladora: str):
 
 
 # Enruta al punto final para realizar predicciones
-@app.get("/predecir_genero/", response_model=GeneroPredicho)
-async def predecir_genero(juego: JuegoFicticio):
+@app.get("/predecir_genero/")
+async def predecir_genero(sentiment_analysis: int, items_count: int, price: int):
     # Escalar las características del nuevo juego
-    juego_numerico = np.array([[juego.sentiment_analysis, juego.items_count, juego.price]])
+    juego_numerico = np.array([[sentiment_analysis, items_count, price]])
     juego_numerico = scaler.transform(juego_numerico)
 
     # Realizar la predicción del género
@@ -290,11 +286,10 @@ async def predecir_genero(juego: JuegoFicticio):
     # Encontrar la categoría de género con la probabilidad más alta
     categoria_genero_predicha = genre_index[np.argmax(prediccion)]
 
-    # Devolver la categoría de género predicha en un objeto JSON con la clave "genres"
+    # Devolver la categoría de género predicha
     return {"genres": categoria_genero_predicha}
 
 # Configurar el registro de eventos
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(__name__)
-
