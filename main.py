@@ -181,12 +181,7 @@ def developer_reviews_analysis(desarrolladora):
     # Retorna el resultado
     return analysis_result
 
-
-
-
-# Modelo
-
-
+#MODELO
 # Carga el conjunto de datos desde el archivo CSV
 tablas = pd.read_csv('modelo.csv')
 
@@ -210,11 +205,11 @@ def entrenar_modelo(tablas):
     X_test_numerico = scaler.transform(X_test[columnas_numericas])
 
     # Diseña la arquitectura de la red neuronal
-    model = keras.Sequential()
-    model.add(keras.layers.Input(shape=(X_train_numerico.shape[1],)))  # Capa de entrada
-    model.add(keras.layers.Dense(64, activation='relu'))  # Capa oculta 1
-    model.add(keras.layers.Dense(32, activation='relu'))  # Capa oculta 2
-    model.add(keras.layers.Dense(len(y.unique()), activation='softmax'))  # Capa de salida
+    model = tf.keras.Sequential()
+    model.add(tf.keras.layers.Input(shape=(X_train_numerico.shape[1],)))  # Capa de entrada
+    model.add(tf.keras.layers.Dense(64, activation='relu'))  # Capa oculta 1
+    model.add(tf.keras.layers.Dense(32, activation='relu'))  # Capa oculta 2
+    model.add(tf.keras.layers.Dense(len(y.unique()), activation='softmax'))  # Capa de salida
 
     # Compila el modelo
     model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
@@ -230,6 +225,7 @@ def entrenar_modelo(tablas):
 
 # Llama a la función para entrenar el modelo
 model, scaler, columnas_numericas = entrenar_modelo(tablas)
+
 
 
 
@@ -290,6 +286,27 @@ async def predecir_genero(sentiment_analysis: int, items_count: int, price: int)
     return {"genres": categoria_genero_predicha}
 
 # Configurar el registro de eventos
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
+
+# Endpoint MODELO
+@app.get("/predecir_genero/")
+async def predecir_genero(sentiment_analysis: int, items_count: int, price: int):
+    # Escala las características del nuevo juego utilizando el mismo escalador
+    nuevo_juego_numerico = scaler.transform(np.array([[sentiment_analysis, items_count, price]]))
+
+    # Realiza la predicción del índice del género
+    probabilidades_genero = model.predict(nuevo_juego_numerico)
+
+    # Obtiene el índice del género con la mayor probabilidad
+    indice_genero_predicho = np.argmax(probabilidades_genero)
+
+    # Convierte el índice del género en la etiqueta original
+    genero_predicho = genre_index[indice_genero_predicho]
+
+    return {"genres": genero_predicho}
+
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(__name__)
