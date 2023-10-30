@@ -190,11 +190,17 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-tablas = pd.read_csv('modelo.csv')
+# Definir la clase JuegoFicticio para el objeto de entrada
+class JuegoFicticio(BaseModel):
+    sentiment_analysis: int
+    items_count: int
+    price: int
 
-
-
-def entrenar_modelo(tablas):
+# Cargar el modelo entrenado y los objetos necesarios
+def cargar_modelo():
+    tablas = pd.read_csv('modelo.csv')
+    
+    def entrenar_modelo(tablas):
     # Divide los datos en características (X) y etiquetas (y)
     X = tablas.drop('genres', axis=1)  # Excluye la columna 'genres' como característica
     y = tablas['genres']
@@ -232,10 +238,21 @@ def entrenar_modelo(tablas):
 
     # Evalúa el modelo
     score = model.evaluate(X_test_numerico, y_test)
-    logger.info(f'Precisión del modelo en el conjunto de prueba: {score[1]:.2f}')
-
+    
     # Devuelve el modelo entrenado
     return model
+
+
+
+    model = entrenar_modelo(tablas)
+    label_encoder = LabelEncoder()
+    label_encoder.classes_ = np.load('label_encoder_classes.npy')
+    scaler = StandardScaler()
+    scaler.mean_ = np.load('scaler_mean.npy')
+    scaler.scale_ = np.load('scaler_scale.npy')
+
+    return model, label_encoder, scaler
+
 
 
 
@@ -277,16 +294,18 @@ async def analizar_desarrollador(desarrolladora: str):
 # Enruta al punto final para realizar predicciones
 @app.get("/predecir_genero/")
 async def predecir_genero(juego: JuegoFicticio):
-    # Escala las características del nuevo juego
+    # Cargar el modelo y los objetos necesarios
+    model, label_encoder, scaler = cargar_modelo()
+
+    # Escalar las características del nuevo juego
     juego_numerico = np.array([[juego.sentiment_analysis, juego.items_count, juego.price]])
     juego_numerico = scaler.transform(juego_numerico)
 
-    # Realiza la predicción del género
+    # Realizar la predicción del género
     prediccion = model.predict(juego_numerico)
 
-    # Encuentra la categoría de género con la probabilidad más alta
+    # Encontrar la categoría de género con la probabilidad más alta
     categoria_genero_predicha = label_encoder.classes_[np.argmax(prediccion)]
 
-    # Devuelve la categoría de género predicha
+    # Devolver la categoría de género predicha
     return {"Categoría de género predicha": categoria_genero_predicha}
-
