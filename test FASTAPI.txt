@@ -21,4 +21,9 @@ Valve
 # Modelo red neuronal predictiva (Sentiment_analysis, items_count,price)
 retorna (genres) 
 
+0.1.2
+1 a 100
+0 a 100000
 
+[0,1,100000]
+[2,1,20]
