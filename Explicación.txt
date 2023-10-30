@@ -1,0 +1,131 @@
+Etapas de mi projecto 1
+
+ELT
+arhivo items.ipnb
+Carga de bibliotecas de los archivos (intenté trabajar con formato más pequeños que 
+.csv pero ocurrian otros problemas en github con otros valores máximos)
+por eso las librerias de pyparrow para parquet ademas de pandas, numpy, json, etc
+Abri los archivos .json e iterando con ast.literal_eval que analiza cada linea
+luego los convertí en data frame.
+En esta etapa me focalice en los user_id de reviews y items como en id de games
+en sacar los valores duplicados (que fueran datos gemelos, no solo el identificador
+duplicado, sino que pertenecieran a datos iguales). Que fue lo más importante.
+identifique las columnas con las que tenía que trabajar.
+Hice algunos analisis exploratorios de quartiles, medias, distribución de datos 
+(desviación estandar), use algunos graficos como bloxplot e histogramas (nada 
+definitivo, solo exploratorio). Me di cuenta que el uso de quartiles elimina los datos
+con valores cero en columnas importantes como price. Me interese en la info() y el 
+tipo de variables de las columnas. También vi que podia sacar de las columnas anidadas,
+Vi sesgos pequeños a derecha con histogramas leptocurticos.
+Identifique columnas importantes como distribució de reseñas, años, desarrolladores.
+Es una etapa que sirve de previa para la aplicaciones de funciones
+____________________________________________________________________ 
+Segundo filtro
+concat.ipynb
+
+En esta parte me concentr en unir (concat o merge) las tablas para resolver las funciones
+
+
+Me toca crear basicamente funciones que van a tener que abrir archivos
+con problemas de separadores, NaN, convertirlos a dicc de Python, crear nuevos data frame
+con la tablas y columnas necesarias para resolver las funciones. Probarlas con ejempos,
+Aparecen las bibliotecas que vamos a tener que subir al requeriment.txt.
+Veo que en ocaciones puedo usar user_id para reviews y items y otras id de games con las otras
+tablas por id y item_id... 
+Un desafio fue reducir al minimo los .csv para cargar al github, por eso luego de ejecutar con 
+exito la función opté por crear un nuevo data frame solo con esas columnas y subirlo al repo.
+Aca fue donde me di cuenta que el archivo parque ocupa menos espacio, pero tiene que 
+pasar por el mismo proceso de filtrado de columnas que los .csv porque tiene un limite 
+mas bajo que los .csv en github. 
+Otra cuestion fue ver que los limites de los quartiles nos quitaban datos importantes a la hora
+de eliminar outliers y estos solo representan entre un 6 y 7% de los valores.
+
+__________________________________________________________________________ 
+Archivo para correr en Render y FastAPI
+main.py
+
+Primero se importan las librerias.
+Luego se llama a app = FastAPI().
+Hay que tener en cuenta algunos parametros para asignar ruta 
+por ejemplo los CORS hay otros para Machin learning que pueden ser o no necesarios...
+por cada función empezamos con un orden primero funciones luego en orden los endpoint
+
+Abrimos el .csv 
+# primera consulta
+def ...
+	return
+# segundo endpoint
+def...
+	return
+....
+asi con todas las restantes funciones
+....
+luego vienen los endpoint
+
+@app.get() # propiamente dicho la declaración de endpoint.
+async def #  async def # Esto permite que la función se ejecute en segundo plano.
+
+	resultado
+	return 
+
+_______________________________________________________________________________ 
+El EDA
+EDA.ipynb
+
+Si bien el EDA es la parte donde exploramos más profundamente los datos, podemos incluso
+limpiar más que en el ELT. También es sumamente importante determinación de Promedios el Analisis Descriptivo, 
+Análisis Univariado, Bivariado, Multivariado con su respectiva visualizació de los datos.
+las conclusiones en esta etapa pueden estar o no. Pero lo que no puede faltar es la presentación
+de los Resultados de los Análisis. 
+Asi que luego que identificamos los datos y limpiamos al máximo las tablas las que podemos juntar.
+hacemos el trabajo del EDA.
+Los número por si mismo dicen poco hasta que podemos ver los gráficos
+Mis tablas gráficas son 
+Frecuencia en función del Analisis de sentimientos.
+Frecuencia en funció de ítems.
+Cantidad de Reseñas en función de Recomendación.
+Puntuación de Sentimiento en "relación" Cantidad de Ítems.
+Matriz de correlación de las variables numéricas (columnas) ninguna para quitar.
+PCA (Analisis de Componentes Principales) #3D (espacial x,y,z).
+Gráfico de Pares (Analisis de Sentimientos, Cantidad de Items, Precio).
+Histograma de Frencuencia en función de categorias.
+Grafico de Caja para precio, lo que muestra outliers (U$S).
+Diagrama de Violí de Precio en función de los géneros.
+_______________________________________________________ 
+Modelo de ML o DL o IA. 
+De nuevo limpieza, Codificación de variables, Selección de caracteristicas, Conjunto de datos,
+Escalado, Modelado RN, Entrenamiento, Validación.
+Puse el foco en los tipos de géneros  y en función de la media de recomendación.
+Me fije en los Títulos.
+Segui importando bibliotecas las de tensorflow en las últimas versiones ya trabajan 
+con keras.
+
+Dividi los datos en conjunto de entrenamiento y prueba por defecto (lo mismo de clase)
+Escale con variables numéricas
+Diseñe la red neuronal con keras (modelo de entrada, oculta y salida), estandar digamos.
+Entrena, evalúa... Corren en 10 épocas o ciclos. con resultados de loss y accuracy promedios 
+que fueron óptimos en python más que en la API, esto no se por qué... Pero funciona mejor
+exagerando los parametros de entrada. 
+Básicamente mi modelo pregunta tres variables y predice (respecto a los datos en que trabajo,
+ya que el modelo se entrenó  en base a esos datos). Analisis de Sentimiento, Cantidad de Items y
+precio, la salida es un género. 
+Lo importante es que se puede entrenar el modelo en render y ver los resultados en FastAPI.
+
+Eso es todo! 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
