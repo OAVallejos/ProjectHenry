@@ -1,29 +1,6 @@
 link FASTAPI
 https://aridatafull.onrender.com/docs
 
-
-#Creación entorno de trabajo:
-INSTALAR ANACONDA
-terminal de conda
-cd "C:\Users\...\HENRY\Proyecto 1\DATASET"
-conda create --prefix .\nombre_del_entorno python=3.8
-conda activate .\MiProyecto 
-conda install ipykernel --update-deps --force-reinstall
-python -m pip install --upgrade pip
-pip install nltk
-pip install json
-pip install pandas
-pip install matplotlib
-pip install uvicorn
-pip install fastapi
-pip install ast
-pip freeze > requirements.txt
-pip install textblob
-pip install spacy
-pip install -U -r requirements.txt
-
-
-
 https://github.com/OAVallejos/ProjectHenry
 contiene los archiovos que se udaron en la FASTAPI
 que son los 5 endpoint más 1 modelo. 
@@ -34,7 +11,20 @@ _que hice detalle
 
 https://github.com/OAVallejos/ArchivoProject1Henry
 
-ModelML.ipynb
-Concat.ipynb
-Eda.ipynb
-items.ipynb
+items.ipynb (ELT)
+Concat.ipynb (FUNCIONES)
+Eda.ipynb (EDA)
+ModelML.ipynb (RED NEURONAL)
+
+
+Entrega del trabajo:
+VIDEO DE YOUTUBE 
+https://youtu.be/f9weouaMjJ4?si=5R2i5M4vzQAfcfaB
+
+Resumen:
+https://aridatafull.onrender.com/docs
+https://github.com/OAVallejos/ProjectHenry
+https://github.com/OAVallejos/ArchivoProject1Henry
+README.txt
+Explicación.txt
+https://youtu.be/f9weouaMjJ4?si=5R2i5M4vzQAfcfaB

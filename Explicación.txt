@@ -1,5 +1,35 @@
 Etapas de mi projecto 1
+Me toco hacer esto porque el VSC cuando creo mi entorno vnev toma la última versión,
+y eso genera problemas de compatibilidad con las librerias de IA, por eso uso Anaconda,
+por saca de algún ugar python 3.8, una versión que no se consigue en la página ofical.
 
+ENTORNO DE TRABAJO EN VSC (PYTHON/ANACONDA)
+#Creación entorno de trabajo:
+INSTALAR ANACONDA
+terminal de conda
+cd "C:\Users\...\HENRY\Proyecto 1\DATASET"
+conda create --prefix .\nombre_del_entorno python=3.8
+conda activate .\MiProyecto 
+conda install ipykernel --update-deps --force-reinstall
+python -m pip install --upgrade pip
+pip install nltk
+pip install json
+pip install pandas
+pip install matplotlib
+pip install uvicorn
+pip install fastapi
+pip install ast
+pip freeze > requirements.txt
+pip install textblob
+pip install spacy
+pip install -U -r requirements.txt
+luego me toco seguir con otros... 
+___________________________________________________________________________ 
+README Y FASTAPI
+Luego de crear mis repositorios públicos en github lo vinculé a render.com, 
+para probar un "hola mundo!" directamente a la fastapy desde mi main.py.
+
+________________________________________________________________________ 
 ELT
 arhivo items.ipnb
 Carga de bibliotecas de los archivos (intenté trabajar con formato más pequeños que 
