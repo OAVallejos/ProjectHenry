@@ -185,9 +185,7 @@ def developer_reviews_analysis(desarrolladora):
 
 # Modelo
 
-# Set up logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+
 
 # Definir la clase JuegoFicticio para el objeto de entrada
 class JuegoFicticio(BaseModel):
@@ -195,60 +193,54 @@ class JuegoFicticio(BaseModel):
     items_count: int
     price: int
 
-# Cargar el modelo entrenado y los objetos necesarios
-def cargar_modelo():
-    tablas = pd.read_csv('modelo.csv')
 
-    def entrenar_modelo(tablas):
-        # Divide los datos en características (X) y etiquetas (y)
-        X = tablas.drop('genres', axis=1)  # Excluye la columna 'genres' como característica
-        y = tablas['genres']
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-        # Codifica los géneros como valores numéricos
-        label_encoder = LabelEncoder()
-        y_encoded = label_encoder.fit_transform(y)
+# Cargar el archivo CSV con los datos
+tablas = pd.read_csv('modelo.csv')
 
-        # Divide los datos en conjuntos de entrenamiento y prueba
-        X_train, X_test, y_train, y_test = train_test_split(X, y_encoded, test_size=0.2, random_state=42)
+# Usamos factorize para asignar índices a las etiquetas únicas en la columna 'genres'
+tablas['genres'], genre_index = tablas['genres'].factorize()
 
-        # Selecciona las características numéricas
-        columnas_numericas = ['sentiment_analysis', 'items_count', 'price']
+def entrenar_modelo(tablas):
+    # Divide los datos en características (X) y etiquetas (y)
+    X = tablas.drop('genres', axis=1)  # Excluye la columna 'genres' como característica
+    y = tablas['genres']
 
-        X_train_numerico = X_train[columnas_numericas]
-        X_test_numerico = X_test[columnas_numericas]
+    # Divide los datos en conjuntos de entrenamiento y prueba
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-        # Escala solo las características numéricas
-        scaler = StandardScaler()
-        X_train_numerico = scaler.fit_transform(X_train_numerico)
-        X_test_numerico = scaler.transform(X_test_numerico)
+    # Selecciona las características numéricas
+    columnas_numericas = ['sentiment_analysis', 'items_count', 'price']
 
-        # Diseña la arquitectura de la red neuronal
-        model = keras.Sequential()
-        model.add(keras.layers.Input(shape=(X_train_numerico.shape[1],)))  # Capa de entrada
-        model.add(keras.layers.Dense(64, activation='relu'))  # Capa oculta 1
-        model.add(keras.layers.Dense(32, activation='relu'))  # Capa oculta 2
-        model.add(keras.layers.Dense(len(label_encoder.classes_), activation='softmax'))  # Capa de salida
-
-        # Compila el modelo
-        model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
-
-        # Entrena el modelo
-        model.fit(X_train_numerico, y_train, epochs=10, batch_size=32, validation_split=0.2)
-
-        # Evalúa el modelo
-        score = model.evaluate(X_test_numerico, y_test)
-
-        # Devuelve el modelo entrenado
-        return model
-
-    model = entrenar_modelo(tablas)
-    label_encoder = LabelEncoder()
-    label_encoder.classes_ = np.load('label_encoder_classes.npy')
+    # Escala solo las características numéricas
     scaler = StandardScaler()
-    scaler.mean_ = np.load('scaler_mean.npy')
-    scaler.scale_ = np.load('scaler_scale.npy')
+    X_train_numerico = scaler.fit_transform(X_train[columnas_numericas])
+    X_test_numerico = scaler.transform(X_test[columnas_numericas])
 
-    return model, label_encoder, scaler
+    # Diseña la arquitectura de la red neuronal
+    model = keras.Sequential()
+    model.add(keras.layers.Input(shape=(X_train_numerico.shape[1],)))  # Capa de entrada
+    model.add(keras.layers.Dense(64, activation='relu'))  # Capa oculta 1
+    model.add(keras.layers.Dense(32, activation='relu'))  # Capa oculta 2
+    model.add(keras.layers.Dense(len(y.unique()), activation='softmax'))  # Capa de salida
+
+    # Compila el modelo
+    model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+
+    # Entrena el modelo
+    model.fit(X_train_numerico, y_train, epochs=10, batch_size=32, validation_split=0.2)
+
+    # Evalúa el modelo
+    score = model.evaluate(X_test_numerico, y_test)
+
+    # Devuelve el modelo entrenado, el escalador y las columnas numéricas
+    return model, scaler, columnas_numericas
+
+# Llama a la función para entrenar el modelo
+model, scaler, columnas_numericas = entrenar_modelo(tablas)
 
 
 
@@ -292,9 +284,6 @@ async def analizar_desarrollador(desarrolladora: str):
 # Enruta al punto final para realizar predicciones
 @app.get("/predecir_genero/")
 async def predecir_genero(juego: JuegoFicticio):
-    # Cargar el modelo y los objetos necesarios
-    model, label_encoder, scaler = cargar_modelo()
-
     # Escalar las características del nuevo juego
     juego_numerico = np.array([[juego.sentiment_analysis, juego.items_count, juego.price]])
     juego_numerico = scaler.transform(juego_numerico)
@@ -303,7 +292,7 @@ async def predecir_genero(juego: JuegoFicticio):
     prediccion = model.predict(juego_numerico)
 
     # Encontrar la categoría de género con la probabilidad más alta
-    categoria_genero_predicha = label_encoder.classes_[np.argmax(prediccion)]
+    categoria_genero_predicha = genre_index[np.argmax(prediccion)]
 
     # Devolver la categoría de género predicha
     return {"Categoría de género predicha": categoria_genero_predicha}
