@@ -189,7 +189,6 @@ def developer_reviews_analysis(desarrolladora):
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-
 # Definir la clase JuegoFicticio para el objeto de entrada
 class JuegoFicticio(BaseModel):
     sentiment_analysis: int
@@ -199,50 +198,48 @@ class JuegoFicticio(BaseModel):
 # Cargar el modelo entrenado y los objetos necesarios
 def cargar_modelo():
     tablas = pd.read_csv('modelo.csv')
-    
+
     def entrenar_modelo(tablas):
-    # Divide los datos en características (X) y etiquetas (y)
-    X = tablas.drop('genres', axis=1)  # Excluye la columna 'genres' como característica
-    y = tablas['genres']
+        # Divide los datos en características (X) y etiquetas (y)
+        X = tablas.drop('genres', axis=1)  # Excluye la columna 'genres' como característica
+        y = tablas['genres']
 
-    # Codifica los géneros como valores numéricos
-    label_encoder = LabelEncoder()
-    y_encoded = label_encoder.fit_transform(y)
+        # Codifica los géneros como valores numéricos
+        label_encoder = LabelEncoder()
+        y_encoded = label_encoder.fit_transform(y)
 
-    # Divide los datos en conjuntos de entrenamiento y prueba
-    X_train, X_test, y_train, y_test = train_test_split(X, y_encoded, test_size=0.2, random_state=42)
+        # Divide los datos en conjuntos de entrenamiento y prueba
+        X_train, X_test, y_train, y_test = train_test_split(X, y_encoded, test_size=0.2, random_state=42)
 
-    # Selecciona las características numéricas
-    columnas_numericas = ['sentiment_analysis', 'items_count', 'price']
+        # Selecciona las características numéricas
+        columnas_numericas = ['sentiment_analysis', 'items_count', 'price']
 
-    X_train_numerico = X_train[columnas_numericas]
-    X_test_numerico = X_test[columnas_numericas]
+        X_train_numerico = X_train[columnas_numericas]
+        X_test_numerico = X_test[columnas_numericas]
 
-    # Escala solo las características numéricas
-    scaler = StandardScaler()
-    X_train_numerico = scaler.fit_transform(X_train_numerico)
-    X_test_numerico = scaler.transform(X_test_numerico)
+        # Escala solo las características numéricas
+        scaler = StandardScaler()
+        X_train_numerico = scaler.fit_transform(X_train_numerico)
+        X_test_numerico = scaler.transform(X_test_numerico)
 
-    # Diseña la arquitectura de la red neuronal
-    model = keras.Sequential()
-    model.add(keras.layers.Input(shape=(X_train_numerico.shape[1],)))  # Capa de entrada
-    model.add(keras.layers.Dense(64, activation='relu'))  # Capa oculta 1
-    model.add(keras.layers.Dense(32, activation='relu'))  # Capa oculta 2
-    model.add(keras.layers.Dense(len(label_encoder.classes_), activation='softmax'))  # Capa de salida
+        # Diseña la arquitectura de la red neuronal
+        model = keras.Sequential()
+        model.add(keras.layers.Input(shape=(X_train_numerico.shape[1],)))  # Capa de entrada
+        model.add(keras.layers.Dense(64, activation='relu'))  # Capa oculta 1
+        model.add(keras.layers.Dense(32, activation='relu'))  # Capa oculta 2
+        model.add(keras.layers.Dense(len(label_encoder.classes_), activation='softmax'))  # Capa de salida
 
-    # Compila el modelo
-    model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+        # Compila el modelo
+        model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
 
-    # Entrena el modelo
-    model.fit(X_train_numerico, y_train, epochs=10, batch_size=32, validation_split=0.2)
+        # Entrena el modelo
+        model.fit(X_train_numerico, y_train, epochs=10, batch_size=32, validation_split=0.2)
 
-    # Evalúa el modelo
-    score = model.evaluate(X_test_numerico, y_test)
-    
-    # Devuelve el modelo entrenado
-    return model
+        # Evalúa el modelo
+        score = model.evaluate(X_test_numerico, y_test)
 
-
+        # Devuelve el modelo entrenado
+        return model
 
     model = entrenar_modelo(tablas)
     label_encoder = LabelEncoder()
@@ -252,6 +249,7 @@ def cargar_modelo():
     scaler.scale_ = np.load('scaler_scale.npy')
 
     return model, label_encoder, scaler
+
 
 
 
