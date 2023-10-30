@@ -1,0 +1,24 @@
+# Primer endpoint (developer)
+KintoGames
+Valve
+
+#Segundo endpoint (user_id)
+76561197970982479
+js41637
+
+# Tercer endpoint (genre)
+Action
+Simulation
+
+# Cuarto endpoint (year)
+2015
+2016
+
+# Quinto endpoint (developer)
+Tripwire Interactive
+Valve
+
+# Modelo red neuronal predictiva (Sentiment_analysis, items_count,price)
+retorna (genres) 
+
+
