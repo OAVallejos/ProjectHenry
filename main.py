@@ -185,6 +185,12 @@ def developer_reviews_analysis(desarrolladora):
 
 # Modelo
 
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name)
+
+
 # Carga el conjunto de datos desde el archivo CSV
 tablas = pd.read_csv('modelo.csv')
 
@@ -234,6 +240,8 @@ class JuegoFicticio(BaseModel):
     sentiment_analysis: int
     items_count: int
     price: int
+
+
 
 
 
