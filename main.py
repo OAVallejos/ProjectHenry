@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Dict
 import json
-
+from pydantic import BaseModel
 import logging
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
