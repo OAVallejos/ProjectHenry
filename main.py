@@ -183,13 +183,8 @@ def developer_reviews_analysis(desarrolladora):
 
 
 
+
 # Modelo
-
-
-# Set up logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name)
-
 
 # Carga el conjunto de datos desde el archivo CSV
 tablas = pd.read_csv('modelo.csv')
@@ -250,7 +245,6 @@ class JuegoFicticio(BaseModel):
 
 
 
-
 # Endpoint
 @app.get("/developer/{developer}")
 async def get_developer(developer: str):
@@ -284,7 +278,7 @@ async def analizar_desarrollador(desarrolladora: str):
 
 
 # Enruta al punto final para realizar predicciones
-@app.get("/predecir_genero/")
+@app.get("/predecir_genero/", response_model=GeneroPredicho)
 async def predecir_genero(juego: JuegoFicticio):
     # Escalar las características del nuevo juego
     juego_numerico = np.array([[juego.sentiment_analysis, juego.items_count, juego.price]])
@@ -296,5 +290,11 @@ async def predecir_genero(juego: JuegoFicticio):
     # Encontrar la categoría de género con la probabilidad más alta
     categoria_genero_predicha = genre_index[np.argmax(prediccion)]
 
-    # Devolver la categoría de género predicha
-    return {"Categoria de genero predicha": categoria_genero_predicha}
+    # Devolver la categoría de género predicha en un objeto JSON con la clave "genres"
+    return {"genres": categoria_genero_predicha}
+
+# Configurar el registro de eventos
+if __name__ == '__main__':
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
+
