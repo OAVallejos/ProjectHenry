@@ -97,7 +97,7 @@ async def #  async def # Esto permite que la función se ejecute en segundo plan
 
 	resultado
 	return 
-
+Por supuesto que corri un test FASTAPI.txt 
 _______________________________________________________________________________ 
 El EDA
 EDA.ipynb
