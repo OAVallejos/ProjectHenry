@@ -185,20 +185,7 @@ def developer_reviews_analysis(desarrolladora):
 
 # Modelo
 
-
-
-# Definir la clase JuegoFicticio para el objeto de entrada
-class JuegoFicticio(BaseModel):
-    sentiment_analysis: int
-    items_count: int
-    price: int
-
-
-# Set up logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# Cargar el archivo CSV con los datos
+# Carga el conjunto de datos desde el archivo CSV
 tablas = pd.read_csv('modelo.csv')
 
 # Usamos factorize para asignar índices a las etiquetas únicas en la columna 'genres'
@@ -241,6 +228,13 @@ def entrenar_modelo(tablas):
 
 # Llama a la función para entrenar el modelo
 model, scaler, columnas_numericas = entrenar_modelo(tablas)
+
+# Definir la clase JuegoFicticio para el objeto de entrada
+class JuegoFicticio(BaseModel):
+    sentiment_analysis: int
+    items_count: int
+    price: int
+
 
 
 
@@ -295,4 +289,4 @@ async def predecir_genero(juego: JuegoFicticio):
     categoria_genero_predicha = genre_index[np.argmax(prediccion)]
 
     # Devolver la categoría de género predicha
-    return {"Categoría de género predicha": categoria_genero_predicha}
+    return {"Categoria de genero predicha": categoria_genero_predicha}
