@@ -6,3 +6,4 @@ fastapi
 numpy
 scikit-learn
 tensorflow
+pydantic
